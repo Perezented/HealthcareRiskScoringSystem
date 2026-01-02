@@ -36,78 +36,9 @@ const results: IResults = {
   data_quality_issues: []
 };
 
-// Fetch patients from the API with pagination
+// Fetch patients data from the API with pagination
 // Default to page 1 and limit 10
 // Retries up to `retryCount` times for transient errors (429, 500, 503) with exponential backoff + jitter
-async function fetchPatientsFromAPI(page: number = 1, limit: number = 10): Promise<IPatient[]> {
-  const url = `https://assessment.ksensetech.com/api/patients?page=${page}&limit=${limit}`;
-  const retryCount = 5;
-  let attempt = 0;
-  const baseDelay = 500; // milliseconds
-
-  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-  while (attempt < retryCount) {
-    try {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "x-api-key": process.env.API_KEY || ""
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return data.patients;
-      }
-
-      // Handle 429 (rate limiting)
-      if (response.status === 429) {
-        const retryAfter = response.headers.get("Retry-After");
-        let delay = baseDelay * Math.pow(2, attempt); // exponential backoff
-        if (retryAfter) {
-          const parsed = parseInt(retryAfter, 10);
-          if (!Number.isNaN(parsed)) {
-            delay = Math.max(delay, parsed * 1000);
-          } else {
-            const date = Date.parse(retryAfter);
-            if (!isNaN(date)) {
-              const delta = date - Date.now();
-              if (delta > 0) delay = Math.max(delay, delta);
-            }
-          }
-        }
-        attempt++;
-        await sleep(delay + Math.floor(Math.random() * 100)); // add jitter
-        continue;
-      }
-
-      // Retry on server errors 500/503
-      if (response.status === 500 || response.status === 503) {
-        attempt++;
-        const delay = baseDelay * Math.pow(2, attempt) + Math.floor(Math.random() * 200);
-        await sleep(delay);
-        continue;
-      }
-
-      // Non-retryable error - throw with body for debugging
-      const text = await response.text();
-      throw new Error(`Request failed with status ${response.status}: ${text}`);
-    } catch (err) {
-      // Network or other unexpected errors - retry
-      attempt++;
-      if (attempt >= retryCount) {
-        throw err;
-      }
-      const delay = baseDelay * Math.pow(2, attempt) + Math.floor(Math.random() * 300);
-      await sleep(delay);
-      continue;
-    }
-  }
-
-  throw new Error(`Failed to fetch patients after ${retryCount} attempts`);
-}
-
 async function fetchDataFromAPI(page: number = 1, limit: number = 10): Promise<IApiResponse> {
   const url = `https://assessment.ksensetech.com/api/patients?page=${page}&limit=${limit}`;
   const retryCount = 5;
@@ -179,7 +110,7 @@ async function fetchDataFromAPI(page: number = 1, limit: number = 10): Promise<I
 
 // Process patients to identify high risk, fever, and data quality issues
 const processPatients = async () => {
-  // Fetch all patients using fetchPatientsFromAPI
+  // Fetch all patients using fetchDataFromAPI with pagination
   // Initial fetch to get total pages and patients
   const patientRecords = await fetchDataFromAPI(1, 20);
   const totalRecords = patientRecords.pagination.total;

@@ -42,97 +42,12 @@ var results = {
     fever_patients: [],
     data_quality_issues: []
 };
-// Fetch patients from the API with pagination
+// Fetch patients data from the API with pagination
 // Default to page 1 and limit 10
 // Retries up to `retryCount` times for transient errors (429, 500, 503) with exponential backoff + jitter
-function fetchPatientsFromAPI() {
-    return __awaiter(this, arguments, void 0, function (page, limit) {
-        var url, retryCount, attempt, baseDelay, sleep, response, data, retryAfter, delay, parsed, date, delta, delay, text, err_1, delay;
-        if (page === void 0) { page = 1; }
-        if (limit === void 0) { limit = 10; }
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    url = "https://assessment.ksensetech.com/api/patients?page=".concat(page, "&limit=").concat(limit);
-                    retryCount = 5;
-                    attempt = 0;
-                    baseDelay = 500;
-                    sleep = function (ms) { return new Promise(function (resolve) { return setTimeout(resolve, ms); }); };
-                    _a.label = 1;
-                case 1:
-                    if (!(attempt < retryCount)) return [3 /*break*/, 14];
-                    _a.label = 2;
-                case 2:
-                    _a.trys.push([2, 11, , 13]);
-                    return [4 /*yield*/, fetch(url, {
-                            method: "GET",
-                            headers: {
-                                "x-api-key": process.env.API_KEY || ""
-                            }
-                        })];
-                case 3:
-                    response = _a.sent();
-                    if (!response.ok) return [3 /*break*/, 5];
-                    return [4 /*yield*/, response.json()];
-                case 4:
-                    data = _a.sent();
-                    return [2 /*return*/, data.patients];
-                case 5:
-                    if (!(response.status === 429)) return [3 /*break*/, 7];
-                    retryAfter = response.headers.get("Retry-After");
-                    delay = baseDelay * Math.pow(2, attempt);
-                    if (retryAfter) {
-                        parsed = parseInt(retryAfter, 10);
-                        if (!Number.isNaN(parsed)) {
-                            delay = Math.max(delay, parsed * 1000);
-                        }
-                        else {
-                            date = Date.parse(retryAfter);
-                            if (!isNaN(date)) {
-                                delta = date - Date.now();
-                                if (delta > 0)
-                                    delay = Math.max(delay, delta);
-                            }
-                        }
-                    }
-                    attempt++;
-                    return [4 /*yield*/, sleep(delay + Math.floor(Math.random() * 100))];
-                case 6:
-                    _a.sent(); // add jitter
-                    return [3 /*break*/, 1];
-                case 7:
-                    if (!(response.status === 500 || response.status === 503)) return [3 /*break*/, 9];
-                    attempt++;
-                    delay = baseDelay * Math.pow(2, attempt) + Math.floor(Math.random() * 200);
-                    return [4 /*yield*/, sleep(delay)];
-                case 8:
-                    _a.sent();
-                    return [3 /*break*/, 1];
-                case 9: return [4 /*yield*/, response.text()];
-                case 10:
-                    text = _a.sent();
-                    throw new Error("Request failed with status ".concat(response.status, ": ").concat(text));
-                case 11:
-                    err_1 = _a.sent();
-                    // Network or other unexpected errors - retry
-                    attempt++;
-                    if (attempt >= retryCount) {
-                        throw err_1;
-                    }
-                    delay = baseDelay * Math.pow(2, attempt) + Math.floor(Math.random() * 300);
-                    return [4 /*yield*/, sleep(delay)];
-                case 12:
-                    _a.sent();
-                    return [3 /*break*/, 1];
-                case 13: return [3 /*break*/, 1];
-                case 14: throw new Error("Failed to fetch patients after ".concat(retryCount, " attempts"));
-            }
-        });
-    });
-}
 function fetchDataFromAPI() {
     return __awaiter(this, arguments, void 0, function (page, limit) {
-        var url, retryCount, attempt, baseDelay, sleep, response, data, retryAfter, delay, parsed, date, delta, delay, text, err_2, delay;
+        var url, retryCount, attempt, baseDelay, sleep, response, data, retryAfter, delay, parsed, date, delta, delay, text, err_1, delay;
         if (page === void 0) { page = 1; }
         if (limit === void 0) { limit = 10; }
         return __generator(this, function (_a) {
@@ -198,11 +113,11 @@ function fetchDataFromAPI() {
                     text = _a.sent();
                     throw new Error("Request failed with status ".concat(response.status, ": ").concat(text));
                 case 11:
-                    err_2 = _a.sent();
+                    err_1 = _a.sent();
                     // Network or other unexpected errors - retry
                     attempt++;
                     if (attempt >= retryCount) {
-                        throw err_2;
+                        throw err_1;
                     }
                     delay = baseDelay * Math.pow(2, attempt) + Math.floor(Math.random() * 300);
                     return [4 /*yield*/, sleep(delay)];
