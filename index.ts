@@ -320,6 +320,9 @@ const evaluatePatients = (patients: IPatient[]) => {
 
     const tempCheck = checkTemperature(patient.temperature);
     tempScore = tempCheck.tempScore;
+    if (tempScore >= 1) {
+      results.fever_patients.push(patient.patient_id);
+    }
     // Age Risk Criteria:
     // {
     //   0: age < 40 | invalid/missing (not number)
@@ -338,7 +341,7 @@ const evaluatePatients = (patients: IPatient[]) => {
       results.data_quality_issues.push(patient.patient_id);
     }
   });
-  console.log({ resultsAfterEvaluation: results });
+  submitResult();
 };
 
 // submit the results to the API (3 total attempts)

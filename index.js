@@ -223,7 +223,6 @@ var processPatients = function () { return __awaiter(_this, void 0, void 0, func
             case 0: return [4 /*yield*/, fetchDataFromAPI(1, 20)];
             case 1:
                 patientRecords = _a.sent();
-                console.log({ initialData: patientRecords });
                 totalRecords = patientRecords.pagination.total;
                 perPage = patientRecords.pagination.limit;
                 totalPages = Math.ceil(totalRecords / perPage);
@@ -363,6 +362,9 @@ var evaluatePatients = function (patients) {
         // }
         var tempCheck = checkTemperature(patient.temperature);
         tempScore = tempCheck.tempScore;
+        if (tempScore >= 1) {
+            results.fever_patients.push(patient.patient_id);
+        }
         // Age Risk Criteria:
         // {
         //   0: age < 40 | invalid/missing (not number)
