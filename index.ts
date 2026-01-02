@@ -201,11 +201,10 @@ const processPatients = async () => {
       // Evaluate patients for this page immediately to keep memory usage low
       evaluatePatients(pageData.data);
       processedCount += pageData.data.length;
-      console.log({ processedPages: page, processedCount });
     }
   }
-  console.log({ allPatientsProcessed: processedCount });
-  // submitResult();
+
+  submitResult();
 }
 
 const checkBloodPressure = (bp?: string) => {
@@ -341,7 +340,6 @@ const evaluatePatients = (patients: IPatient[]) => {
       results.data_quality_issues.push(patient.patient_id);
     }
   });
-  submitResult();
 };
 
 // submit the results to the API (3 total attempts)

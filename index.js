@@ -245,13 +245,12 @@ var processPatients = function () { return __awaiter(_this, void 0, void 0, func
                 // Evaluate patients for this page immediately to keep memory usage low
                 evaluatePatients(pageData.data);
                 processedCount += pageData.data.length;
-                console.log({ processedPages: page, processedCount: processedCount });
                 _a.label = 4;
             case 4:
                 page++;
                 return [3 /*break*/, 2];
             case 5:
-                console.log({ allPatientsProcessed: processedCount });
+                submitResult();
                 return [2 /*return*/];
         }
     });
@@ -382,7 +381,6 @@ var evaluatePatients = function (patients) {
             results.data_quality_issues.push(patient.patient_id);
         }
     });
-    console.log({ resultsAfterEvaluation: results });
 };
 // submit the results to the API (3 total attempts)
 var submitResult = function () {
